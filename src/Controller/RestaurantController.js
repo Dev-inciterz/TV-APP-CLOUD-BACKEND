@@ -28,11 +28,7 @@ exports.AddRestaurant = async (req, res) => {
 exports.UpdateRestaurant = async (req, res) => {
     try {
         const restaurantId = req.params.id;
-
-
-
         let addImg = [];
-
         // If new images are uploaded, upload them to Cloudinary
         if (req.files && req.files.length) {
           const uploadPromises = req.files.map((image) => {
@@ -103,6 +99,93 @@ exports.UpdateRestaurant = async (req, res) => {
         });
     }
 };
+
+
+
+exports.RemoveRestaurantImagesAll = async (req, res) => {
+    try {
+      const restaurantId = req.params.id;
+  
+      // Find the restaurant by ID
+      const restaurant = await Restaurant.findById(restaurantId);
+  
+      if (!restaurant) {
+        return res.status(404).json({ message: "Restaurant not found" });
+      }
+  
+      // Check if the restaurant has any images to delete
+      if (!restaurant.menuImages || !restaurant.menuImages.length) {
+        return res.status(400).json({ message: "No images to delete" });
+      }
+  
+      // Delete the images from Cloudinary
+      const deletePromises = restaurant.menuImages.map((imageUrl) => {
+        const publicId = imageUrl.split('/').pop().split('.')[0]; // Extract public_id from the image URL
+        return cloudinary.uploader.destroy(`Menus/${publicId}`);
+      });
+  
+      // Wait for all images to be deleted from Cloudinary
+      await Promise.all(deletePromises);
+  
+      // Remove the images from the database by setting `menuImages` to an empty array
+      restaurant.menuImages = [];
+      await restaurant.save();
+  
+      res.status(200).json({
+        message: "Images removed successfully from Cloudinary and MongoDB",
+        restaurant,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  };
+  
+
+  exports.RemoveSingleImage = async (req, res) => {
+    try {
+      const restaurantId = req.params.id;
+      const imageUrl = req.body.imageUrl; // Get the image URL to be deleted from the request body
+  
+      // Find the restaurant by ID
+      const restaurant = await Restaurant.findById(restaurantId);
+  
+      if (!restaurant) {
+        return res.status(404).json({ message: "Restaurant not found" });
+      }
+  
+      // Check if the image exists in the restaurant's menuImages array
+      const imageIndex = restaurant.menuImages.indexOf(imageUrl);
+      if (imageIndex === -1) {
+        return res.status(400).json({ message: "Image not found in the restaurant's menuImages" });
+      }
+  
+      // Extract the public_id from the image URL
+      const publicId = imageUrl.split('/').pop().split('.')[0];
+  
+      // Delete the image from Cloudinary
+      await cloudinary.uploader.destroy(`Menus/${publicId}`);
+  
+      // Remove the image from the menuImages array
+      restaurant.menuImages.splice(imageIndex, 1); // Remove the image at the found index
+      await restaurant.save(); // Save the updated restaurant document
+  
+      res.status(200).json({
+        message: "Image removed successfully from Cloudinary and MongoDB",
+        restaurant,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  };
+  
 
 
 exports.DeleteRestaurant = async (req, res) => {

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const RestaurantSchema = new Schema({
+const RestaurantSchema = new mongoose.Schema({
     name: {
       type: String,
       required: true
@@ -35,7 +35,7 @@ const RestaurantSchema = new Schema({
     },
     screens: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Screen' // Reference to the screens associated with this restaurant
       }
     ],
@@ -81,4 +81,5 @@ const RestaurantSchema = new Schema({
   });
   
   const Restaurant = mongoose.model('Restaurant', RestaurantSchema);
+  
   module.exports = Restaurant;

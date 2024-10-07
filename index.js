@@ -41,9 +41,14 @@ db.on("disconnected", () => {
 
 
 const RestaurantownerRouter = require('./src/Routes/restaurantowner')
+const RestaurantRouter = require('./src/Routes/restaurant')
+
 
 
 app.use("/restaurantowner", RestaurantownerRouter);
+
+app.use("/restaurant", RestaurantRouter);
+
 
 
 setInterval(() => {

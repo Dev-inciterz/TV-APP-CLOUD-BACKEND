@@ -77,5 +77,8 @@ RestaurantOwnerSchema.methods.generateAuthToken = async function () {
     next();
   });
 
+
+
 const RestaurantOwner = mongoose.model('RestaurantOwner', RestaurantOwnerSchema);
+
 module.exports = RestaurantOwner;

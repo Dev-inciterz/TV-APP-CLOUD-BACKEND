@@ -1,37 +1,34 @@
 const RestaurantOwner = require("../Models/RestaurantOwner");
 
-
 exports.Signup = async (req, res) => {
-    console.log("ejvbevb jwe fjlk.we, ewjv kel")
+  console.log("ejvbevb jwe fjlk.we, ewjv kel");
 
-    try {
+  try {
+    const restowner = new RestaurantOwner({
+      email: req.body.email,
+      password: req.body.password,
+      name: req.body.name,
+    });
 
-        const restowner = new RestaurantOwner({email:req.body.email, password:req.body.password, name:req.body.name})
+    const token = await restowner.generateAuthToken();
 
-        const token = await restowner.generateAuthToken();
+    const result = await restowner.save();
 
-        const result =    await restowner.save();
+    console.log("the restowner saved", result);
 
-        console.log("the restowner saved", result)
-
-        res.status(201).json({
-            message: "RestaurantOwner Added successfully",
-            result:result,
-            token:token
-          });
-
-        
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-          message: "something went wrong",
-          error: error.message,
-        });
-    }
- 
+    res.status(201).json({
+      message: "RestaurantOwner Added successfully",
+      result: result,
+      token: token,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "something went wrong",
+      error: error.message,
+    });
+  }
 };
-
-
 
 exports.Login = async (req, res) => {
   try {
