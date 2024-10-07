@@ -1,17 +1,17 @@
 const jwt = require("jsonwebtoken");
-const User = require("../Models/Users");
-const Auth = async (req, res, next) => {
+const RestaurantOwner = require("../Models/RestaurantOwner");
+const RestaurantOwnerAuth = async (req, res, next) => {
   try {
     
     if(req.header("Authorization")){
       const token = req.header("Authorization").replace('Bearer ', '')
-      const decoded = jwt.verify(token, process.env.UserTokenKey);
-      const user = await User.findOne({ _id: decoded._id, "tokens.token": token });
-      if (!user) {
+      const decoded = jwt.verify(token, process.env.RestaurantOwnerTokenKey);
+      const restowner = await RestaurantOwner.findOne({ _id: decoded._id, "tokens.token": token });
+      if (!restowner) {
         throw new Error();
       }
       else{
-      req.user = user;
+      req.restowner = restowner;
       next();
   }
 
@@ -27,4 +27,4 @@ const Auth = async (req, res, next) => {
     next()
   }
 };
-module.exports = Auth;
+module.exports = RestaurantOwnerAuth;

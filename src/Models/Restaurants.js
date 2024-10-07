@@ -17,20 +17,22 @@ const RestaurantSchema = new Schema({
     required: true
   },
 
+  website: {
+    type: String,
+  },
+
     location: {
       type: String,
-      required: true
+      // required: true
     },
     owner: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'RestaurantOwner', // Reference to the restaurant owner
       required: true
     },
-    menuImages: [
-      {
-        type: String // URLs for the menu images
-      }
-    ],
+    menuImages: {
+      type: [String],
+    },
     screens: [
       {
         type: Schema.Types.ObjectId,
@@ -45,8 +47,6 @@ const RestaurantSchema = new Schema({
         },
       ],
   }, { timestamps: true });
-
-
 
   // Method for generating the Auth Token which is being called by the function of login and signup from Router files
   RestaurantSchema.methods.generateAuthToken = async function () {
@@ -67,23 +67,18 @@ const RestaurantSchema = new Schema({
       }
     
       const isMatch = await bcrypt.compare(password, restaurant.password);
-    
       if (!isMatch) {
         throw new Error("Password didn't Match");
       }
       return user;
     };
-  
     RestaurantSchema.pre("save", async function (next) {
     const Restaurant = this;
-  
     if (Restaurant.isModified("password")) {
         Restaurant.password = await bcrypt.hash(Restaurant.password, 8);
     }
-  
     next();
   });
   
   const Restaurant = mongoose.model('Restaurant', RestaurantSchema);
   module.exports = Restaurant;
-  

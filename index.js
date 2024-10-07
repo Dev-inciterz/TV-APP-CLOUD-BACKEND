@@ -40,22 +40,15 @@ db.on("disconnected", () => {
 });
 
 
-// const UserRouter = require('./src/Routes/user')
+const RestaurantownerRouter = require('./src/Routes/restaurantowner')
 
 
-
-
-
-// app.use("/user", UserRouter);
-
-
+app.use("/restaurantowner", RestaurantownerRouter);
 
 
 setInterval(() => {
   console.log("I am just aliving the server")
-  
 }, 1000000);
-
 
 app.listen(port, () => {
   console.log(`port has been up at ${port}`);
