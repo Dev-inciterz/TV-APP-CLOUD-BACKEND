@@ -8,9 +8,9 @@ exports.Signup = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       name: req.body.name,
+      phone: req.body.phone,
     });
 
-    const token = await restowner.generateAuthToken();
 
     const result = await restowner.save();
 
@@ -19,7 +19,6 @@ exports.Signup = async (req, res) => {
     res.status(201).json({
       message: "RestaurantOwner Added successfully",
       result: result,
-      token: token,
     });
   } catch (error) {
     console.log(error);
