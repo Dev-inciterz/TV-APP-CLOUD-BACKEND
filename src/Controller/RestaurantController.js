@@ -1,29 +1,52 @@
 const Restaurant = require("../Models/Restaurants")
+const RestaurantOwner = require("../Models/RestaurantOwner")
 
 exports.AddRestaurant = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        
-        const existingRestaurant = await Restaurant.findOne({ email });
-        if (existingRestaurant) {
-            return res.status(400).json({ message: "Restaurant with this email already exists" });
-        }
-        const restaurant = new Restaurant({ name, email, password, owner:req.restowner});
-        
-        await restaurant.save();
-        res.status(201).json({
-            message: "Restaurant added successfully",
-            restaurant,
-            token
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Something went wrong",
-            error: error.message,
-        });
-    }
+
+  console.log("i am being hit forst")
+  try {
+      const { name, email, password } = req.body;
+
+      // Check if the restaurant already exists
+      const existingRestaurant = await Restaurant.findOne({ email });
+      if (existingRestaurant) {
+          return res.status(400).json({ message: "Restaurant with this email already exists" });
+      }
+
+      console.log("eirhcbjkev uier", req.restowner._id)
+
+      // Create a new restaurant with the owner reference
+      const restaurant = new Restaurant({ name, email, password, owner: req.restowner });
+
+      // Save the restaurant
+      await restaurant.save();
+
+      // Find the owner and update the restaurants array by pushing the new restaurant's ID
+      const owner = await RestaurantOwner.findById(req.restowner);
+      if (!owner) {
+          return res.status(404).json({ message: "Owner not found" });
+      }
+      
+      owner.restaurants.push(restaurant._id); // Add restaurant ID to the owner's restaurants array
+      await owner.save(); // Save the updated owner document
+
+
+
+      // Respond with success message
+      res.status(201).json({
+          message: "Restaurant added successfully",
+          // restaurant,
+     
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          message: "Something went wrong",
+          error: error.message,
+      });
+  }
 };
+
 
 exports.UpdateRestaurant = async (req, res) => {
     try {
